@@ -1,0 +1,146 @@
+#pragma once
+#include <iostream>
+using namespace std;
+
+class String{
+private:
+	char* buffer;
+	int length;
+	int size;  //버퍼의 크기	
+
+public:
+	String(int m); //m 크기를 갖는 buffer를 하나 만들어봅시다
+	String(); //기본 생성자
+	~String(); //소멸자
+	String(char* init, int m); // 길이 m인 스트링 init으로 초기화
+	String(char init, int m); //길이 m인 캐릭터형으로 초기화
+	String(const String& s); //복사 생성자
+
+	String& operator=(const String& t); //대입연산자 오버로딩이 되어야 함
+	bool operator == (String t); // 동일한지 비교
+	bool operator!(); // 공백이면 true, 아니면 false
+	int Length(); // 문자수를 반환
+	char* getAddress(int index); //index의 주소를 반환
+	char strToChar(int index); //스트링을 캐릭터로 변환
+	String Concat(String t); // 연결된 스트링을 반환
+	String Substr(int i, int j); // i~j 사이의 스트링을 반환
+	int Find(String pat); // 스트링에서 pat 스트링을 찾아서 위치를 반환, 없으면 -1반환
+	void print();
+};
+
+String::String(int m) {
+	size = m;
+	buffer = new char[m];
+	length = 0;
+}
+
+String::String() :String(10) {};
+
+String::~String() {
+	delete[] buffer;
+}
+
+String::String(char* init, int m) : String(m + 1) { //cat3이 넘어오는 것과 같은 원리
+	for (int i = 0; i < m; i++) {
+		buffer[i] = init[i];
+	}
+	buffer[m] = '\0';
+	length = m;
+}
+
+String::String(char init, int m) : String(m + 1) {
+	buffer[0] = init;
+	buffer[m] = '\0';
+	length = m;
+}
+
+String::String(const String& s) : String(s.length + 1) {
+	for (int i = 0; i < s.length; i++) {
+		buffer[i] = s.buffer[i];
+	}
+	buffer[s.length] = '\0';
+	length = s.length;
+}
+
+String& String::operator=(const String& s) {
+	if (this != nullptr) delete[] buffer;
+	buffer = new char[s.length + 1];
+	for (int i = 0; i < s.length; i++) {
+		buffer[i] = s.buffer[i];
+	}
+	buffer[s.length] = '\0';
+	length = s.length;
+
+	return *this;
+}
+
+bool String::operator==(String t) {
+	for (int i = 0; i < length; i++) {
+		if (buffer[i] != t.buffer[i]) return false;
+	}
+	return true;
+}
+
+bool String::operator!() {
+	if (length == 0) return true;
+	else return false;
+}
+
+int String::Length() {
+	return length;
+}
+
+char* String::getAddress(int index) {
+	if (index >= 0 && index < Length()) return &buffer[index];
+	return buffer;
+}
+
+char String::strToChar(int index) {
+	if (index >= 0 && index < Length()) return buffer[index];
+	return ' ';
+}
+
+String String::Concat(String t) {
+	String result(length + t.length + 1);
+	for (int i = 0; i < length; i++) {
+		result.buffer[i] = buffer[i];
+	}
+	for (int i = 0; i < t.length; i++) {
+		result.buffer[length + i] = t.buffer[i];
+	}
+	result.buffer[length + t.length] = '\0';
+	result.length = length + t.length;
+
+	return result;
+}
+
+String String::Substr(int i, int j) {
+	String sub(j - i + 2);
+	sub.length = (j - i + 2);
+	for (int k = 0; k < sub.length - 1; k++) {
+		sub.buffer[k] = buffer[k + i];
+	}
+	sub.buffer[sub.length - 1] = '\0';
+	return sub;
+}
+
+int String::Find(String pat) {
+	for (int i = 0; i <= length - pat.length; i++) {
+		int flag = 0;
+		for (int j = 0; j < pat.length; j++) {
+			if (buffer[i + j] == pat.buffer[j])flag++;
+			else break;
+		}
+		if (flag == pat.length) return i;
+		else flag = 0;
+	}
+	return -1;
+}
+
+void String::print() {
+	for (int i = 0; i < length; i++) {
+		cout << buffer[i];
+	}
+	cout << endl;
+	return;
+}
